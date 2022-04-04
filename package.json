@@ -2,6 +2,7 @@
    "name": "dhu-atender",
    "version": "1.0.0",
    "description": "出席システムだるいよな",
+   "type": "module",
    "scripts": {
       "start": "node index.js"
    },
