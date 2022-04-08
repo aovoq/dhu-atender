@@ -3,7 +3,20 @@ import cron from 'node-cron'
 import fs from 'fs'
 import 'dotenv/config'
 
-const timetable = JSON.parse(fs.readFileSync('./out.json', 'utf8'))
+if (!process.env.DHU_ID || !process.env.DHU_PASS) {
+   console.log('Please touch .env file.')
+   process.exit()
+}
+
+const read = () => {
+   try {
+      return fs.readFileSync('./out.json', 'utf8')
+   } catch (err) {
+      console.log('out.json がありません\ngetdata.js を実行してください。')
+      process.exit()
+   }
+}
+const timetable = read()
 
 const times = [
    '00 31 8 * * *',
@@ -59,55 +72,36 @@ const puppetter = async () => {
       await page.waitForNavigation()
       await browser.close()
       console.log('done!')
+      console.log('waiting...')
    } catch (e) {
       console.log(e)
    }
 }
 
-const run = (time) => {
+const run = (dayOfWeek, time) => {
    console.log('今日の時間割↓')
-   console.table(timetable[0])
-   if (timetable[0][time]) {
-      console.log(`この時間、授業あるぜ！ ${time + 1}限目 授業名: ${timetable[0][time]}`)
+   console.table(timetable[dayOfWeek - 1])
+   if (timetable[dayOfWeek - 1][time]) {
+      console.log(`${time + 1}限目、授業あるぜ！ 授業名: ${timetable[dayOfWeek - 1][time]}`)
       puppetter()
    } else {
-      console.log('この時間、授業ないぜ！ マタネ！')
+      console.log(`${time + 1}限目、授業ないぜ！ マタネ！`)
+      console.log('Waiting...')
    }
 }
 
 const dayCheck = (time) => {
    let date = new Date()
-   let toDay = date.getDay()
-   switch (toDay) {
-      case 1:
-         console.log('今日は月曜日')
-         run(time)
-         break
-      case 2:
-         console.log('今日は火曜日')
-         run(time)
-         break
-      case 3:
-         console.log('今日は水曜日')
-         run(time)
-         break
-      case 4:
-         console.log('今日は木曜日')
-         run(time)
-         break
-      case 5:
-         console.log('今日は金曜日')
-         run(time)
-         break
-      case 6:
-         console.log('今日は土曜日')
-         run(time)
-         break
-      default:
-         console.log('今日、授業なくね？')
-   }
+   let dayOfWeek = date.getDay()
+   let dayOfWeekStr = ['日', '月', '火', '水', '木', '金', '土'][dayOfWeek]
+   console.log(`今日は${dayOfWeekStr}曜日`)
+   run(dayOfWeek, time)
 }
 
 console.log(`ID: ${process.env.DHU_ID}`)
 console.log(`PASS: ${process.env.DHU_PASS}`)
 console.log('Waiting...')
+
+// !(() => {
+//    dayCheck(5)
+// })()
