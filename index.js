@@ -10,7 +10,7 @@ if (!process.env.DHU_ID || !process.env.DHU_PASS) {
 
 const read = () => {
    try {
-      return fs.readFileSync('./out.json', 'utf8')
+      return JSON.parse(fs.readFileSync('./out.json', 'utf8'))
    } catch (err) {
       console.log('out.json がありません\ngetdata.js を実行してください。')
       process.exit()
@@ -29,27 +29,27 @@ const times = [
 
 cron.schedule(times[0], () => {
    console.log('hi! 1限目の時間')
-   dayCheck(0)
+   dayCheck(1)
 })
 cron.schedule(times[1], () => {
    console.log('hi! 2限目の時間')
-   dayCheck(1)
+   dayCheck(2)
 })
 cron.schedule(times[2], () => {
    console.log('hi! 3限目の時間')
-   dayCheck(2)
+   dayCheck(3)
 })
 cron.schedule(times[3], () => {
    console.log('hi! 4限目の時間')
-   dayCheck(3)
+   dayCheck(4)
 })
 cron.schedule(times[4], () => {
    console.log('hi! 5限目の時間')
-   dayCheck(4)
+   dayCheck(5)
 })
 cron.schedule(times[5], () => {
    console.log('hi! 6限目の時間')
-   dayCheck(5)
+   dayCheck(6)
 })
 
 const puppetter = async () => {
@@ -80,12 +80,16 @@ const puppetter = async () => {
 
 const run = (dayOfWeek, time) => {
    console.log('今日の時間割↓')
-   console.table(timetable[dayOfWeek - 1])
-   if (timetable[dayOfWeek - 1][time]) {
-      console.log(`${time + 1}限目、授業あるぜ！ 授業名: ${timetable[dayOfWeek - 1][time]}`)
+   console.log('===========================')
+   timetable[dayOfWeek - 1].map((item, index) => {
+      console.log(`${index + 1}限目: ${item ? item : 'XXXXXX'}`)
+   })
+   console.log('===========================')
+   if (timetable[dayOfWeek - 1][time - 1]) {
+      console.log(`${time}限目、授業あるぜ！ 授業名: ${timetable[dayOfWeek - 1][time - 1]}`)
       puppetter()
    } else {
-      console.log(`${time + 1}限目、授業ないぜ！ マタネ！`)
+      console.log(`${time}限目、授業ないぜ！ マタネ！`)
       console.log('Waiting...')
    }
 }
@@ -101,7 +105,3 @@ const dayCheck = (time) => {
 console.log(`ID: ${process.env.DHU_ID}`)
 console.log(`PASS: ${process.env.DHU_PASS}`)
 console.log('Waiting...')
-
-// !(() => {
-//    dayCheck(5)
-// })()
