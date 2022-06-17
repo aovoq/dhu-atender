@@ -2,6 +2,7 @@ import puppeteer from 'puppeteer'
 import cron from 'node-cron'
 import fs from 'fs'
 import 'dotenv/config'
+import process from 'process'
 
 if (!process.env.DHU_ID || !process.env.DHU_PASS) {
    console.log('Please touch .env file.')
@@ -52,7 +53,7 @@ cron.schedule(times[5], () => {
    dayCheck(6)
 })
 
-const puppetter = async () => {
+const runPuppeteer = async () => {
    try {
       console.log('processing...')
       const browser = await puppeteer.launch({
@@ -87,7 +88,7 @@ const run = (dayOfWeek, time) => {
    console.log('===========================')
    if (timetable[dayOfWeek - 1][time - 1]) {
       console.log(`${time}限目、授業あるぜ！ 授業名: ${timetable[dayOfWeek - 1][time - 1]}`)
-      puppetter()
+      runPuppeteer()
    } else {
       console.log(`${time}限目、授業ないぜ！ マタネ！`)
       console.log('Waiting...')
@@ -104,4 +105,10 @@ const dayCheck = (time) => {
 
 console.log(`ID: ${process.env.DHU_ID}`)
 console.log(`PASS: ${process.env.DHU_PASS}`)
+// console.log(`ID: AXXDCXXX`)
+// console.log(`PASS: XXXXXX`)
 console.log('Waiting...')
+
+if (process.argv[2] === '--now') {
+   runPuppeteer()
+}
